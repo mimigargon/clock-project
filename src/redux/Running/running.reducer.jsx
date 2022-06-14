@@ -1,0 +1,18 @@
+import * as actions from "./running.actions";
+
+const INITIAL_STATE = {
+  running: false,
+};
+
+const runningReducer = (state = INITIAL_STATE, action) => {
+  switch (action.type) {
+    case actions.START_STOPWATCH:
+      return { ...state, running: true };
+    case actions.STOP_STOPWATCH:
+      return { ...state, running: false };
+    default:
+      return state;
+  }
+};
+
+export default runningReducer;

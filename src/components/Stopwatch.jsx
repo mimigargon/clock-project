@@ -1,41 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  incrementStopwatch,
+  resetStopwatch,
+} from "../redux/Stopwatch/stopwatch.actions";
+import {
+  startStopwatch,
+  stopStopwatch,
+} from "../redux/Running/running.actions";
 
 const Stopwatch = () => {
-  const [time, setTime] = useState(0);
-  const [timerOn, setTimerOn] = useState(false);
+  const dispatch = useDispatch();
+  const { stopwatch } = useSelector((state) => state.stopwatch);
+  const { running } = useSelector((state) => state.running);
 
   useEffect(() => {
     let interval = null;
 
-    if (timerOn) {
+    if (running) {
       interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 10);
+        dispatch(incrementStopwatch());
       }, 10);
     } else {
       clearInterval(interval);
     }
 
     return () => clearInterval(interval);
-  }, [timerOn]);
+  }, [running]);
 
   return (
     <div className="stopwatch">
-      <span>{("0" + Math.floor((time / 60000) % 60)).slice(-2)}:</span>
-      <span>{("0" + Math.floor((time / 1000) % 60)).slice(-2)}:</span>
-      <span>{("0" + ((time / 10) % 100)).slice(-2)}:</span>
+      <span>{("0" + Math.floor((stopwatch / 60000) % 60)).slice(-2)}:</span>
+      <span>{("0" + Math.floor((stopwatch / 1000) % 60)).slice(-2)}:</span>
+      <span>{("0" + ((stopwatch / 10) % 100)).slice(-2)}:</span>
+
       <div id="button">
-        {!timerOn && time === 0 && (
-          <button onClick={() => setTimerOn(true)}>Start</button>
+        {!running && stopwatch === 0 && (
+          <button onClick={() => dispatch(startStopwatch())}>Start</button>
         )}
-        {timerOn && <button onClick={() => setTimerOn(false)}>Stop</button>}
-        {!timerOn && time > 0 && (
-          <button onClick={() => setTime(0)}>Reset</button>
+        {running && (
+          <button onClick={() => dispatch(stopStopwatch())}>Stop</button>
         )}
-        {!timerOn && time > 0 && (
-          <button onClick={() => setTimerOn(true)}>Resume</button>
+        {stopwatch > 0 && !running && (
+          <>
+            <button onClick={() => dispatch(startStopwatch())}>Resume</button>
+            <button onClick={() => dispatch(resetStopwatch())}>Reset</button>
+          </>
         )}
       </div>
     </div>
   );
 };
- export default Stopwatch; 
+export default Stopwatch;
